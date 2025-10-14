@@ -714,7 +714,7 @@
                                 <tr>
                                     <th>Item ID</th>
                                     <th>Name</th>
-                                    <th>Location</th>
+                                    <th>Category</th>
                                     <th>Quantity</th>
                                     <th>Expiry Date</th>
                                     <th>Status</th>
@@ -890,44 +890,11 @@
         let nfcReader = null;
         let currentScannedItem = null;
 
-        // Demo Data
-        const demoInventory = [
-            { id: 'MED-001', name: 'Aspirin', location: 'A1', quantity: 50, expiryDate: '2026-12-31' },
-            { id: 'MED-002', name: 'Ibuprofen', location: 'A2', quantity: 30, expiryDate: '2024-10-15' },
-            { id: 'MED-003', name: 'Acetaminophen', location: 'A3', quantity: 45, expiryDate: '2026-11-20' },
-            { id: 'MED-004', name: 'Amoxicillin', location: 'B1', quantity: 25, expiryDate: '2024-08-30' },
-            { id: 'MED-005', name: 'Lisinopril', location: 'B2', quantity: 40, expiryDate: '2026-09-25' },
-            { id: 'MED-006', name: 'Metformin', location: 'B3', quantity: 35, expiryDate: '2026-06-10' },
-            { id: 'MED-007', name: 'Atorvastatin', location: 'C1', quantity: 20, expiryDate: '2024-05-15' },
-            { id: 'MED-008', name: 'Levothyroxine', location: 'C2', quantity: 15, expiryDate: '2026-06-20' },
-            { id: 'MED-009', name: 'Albuterol', location: 'C3', quantity: 10, expiryDate: '2026-04-05' },
-            { id: 'MED-010', name: 'Omeprazole', location: 'D1', quantity: 30, expiryDate: '2026-03-30' }
-        ];
-
-        const demoLogs = [
-            { timestamp: '2023-10-15 09:30:22', user: 'admin', action: 'Login', item: null, details: 'admin logged in' },
-            { timestamp: '2023-10-15 09:35:18', user: 'admin', action: 'Check Out', item: 'Aspirin', details: 'Quantity: 5' },
-            { timestamp: '2023-10-15 10:12:45', user: 'nurse1', action: 'Check Out', item: 'Ibuprofen', details: 'Quantity: 3' },
-            { timestamp: '2023-10-15 11:05:33', user: 'doctor2', action: 'Check Out', item: 'Amoxicillin', details: 'Quantity: 2' },
-            { timestamp: '2023-10-15 14:20:11', user: 'admin', action: 'Add', item: 'Metformin', details: 'New medication added: Metformin' }
-        ];
-
         // Initialize the application
         function initApp() {
             // Check if user is already logged in
             if (currentUser) {
                 showApp();
-            }
-            
-            // Load demo data if no data exists
-            if (inventory.length === 0) {
-                inventory = [...demoInventory];
-                localStorage.setItem('inventory', JSON.stringify(inventory));
-            }
-            
-            if (logs.length === 0) {
-                logs = [...demoLogs];
-                localStorage.setItem('logs', JSON.stringify(logs));
             }
             
             // Update dashboard counts
@@ -1075,12 +1042,7 @@
             
             emptyState.style.display = 'none';
             
-            // Sort inventory by location
-            const sortedInventory = [...inventory].sort((a, b) => {
-                return a.location.localeCompare(b.location);
-            });
-            
-            sortedInventory.forEach(item => {
+            inventory.forEach(item => {
                 const row = document.createElement('tr');
                 const status = getItemStatus(item);
                 
@@ -1334,8 +1296,8 @@
             const name = prompt('Enter medication name:');
             if (!name) return;
             
-            const location = prompt('Enter medication location (e.g., A1, B2):');
-            if (!location) return;
+            const category = prompt('Enter medication category:');
+            if (!category) return;
             
             const quantity = parseInt(prompt('Enter quantity:'));
             if (isNaN(quantity)) return;
@@ -1346,7 +1308,7 @@
             const newItem = {
                 id: `MED-${Date.now()}`,
                 name,
-                location,
+                category,
                 quantity,
                 expiryDate
             };
@@ -1428,8 +1390,6 @@
                 return "To add a new medication, use the NFC scanner with a new medication or manually add it through the system administration.";
             } else if (lowerMessage.includes('log') || lowerMessage.includes('history')) {
                 return `There are ${logs.length} log entries in the system. You can view them on the "Logs" page.`;
-            } else if (lowerMessage.includes('location') || lowerMessage.includes('where')) {
-                return "Items are organized by location (A1, A2, B1, etc.) in the locker. You can view the complete inventory on the 'In-Locker' page.";
             } else {
                 return "I'm here to help with medical inventory management. You can ask me about stock levels, expiring items, or how to use the NFC scanner.";
             }
